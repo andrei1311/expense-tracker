@@ -1,24 +1,36 @@
-import logo from './logo.svg';
+import { useEffect } from "react";
+import {BrowserRouter, Route, Routes } from "react-router-dom"
+import Home from "./Pages/Home/Home";
+import Login from "./Pages/Login/Login";
+import Register from "./Pages/Register/Register";
 import './App.css';
+import { UserRoute } from "./components/UserRoute";
+import {useDispatch} from 'react-redux';
+import {auth} from './firebase/firebase';
+import { setUser } from "./redux/actions";
 
 function App() {
+  const dispatch =useDispatch();
+
+  useEffect(() => {
+    auth.onAuthStateChanged((authUser) => {
+      if(authUser) {
+        dispatch(setUser(authUser))
+      }else {
+        dispatch(setUser(null));
+      }
+    })
+  }, [dispatch])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+        <Routes>
+          < Route exact path="/" element={<UserRoute />} >
+            <Route exact path="/" element={<Home />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+    </BrowserRouter> 
   );
 }
 
